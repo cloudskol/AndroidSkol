@@ -17,8 +17,7 @@ import com.google.android.gms.location.LocationServices;
 public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
+    LocationAPICallback locationAPICallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +42,7 @@ public class MainActivity extends AppCompatActivity {
         TextView locationTextView = (TextView) findViewById(R.id.location);
         locationTextView.setText("Tham");
 
-        final LocationAPICallback locationAPICallback = new LocationAPICallback();
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(locationAPICallback)
-                .addOnConnectionFailedListener(locationAPICallback)
-                .build();
+        locationAPICallback = new LocationAPICallback(this);
     }
 
     @Override
@@ -76,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        googleApiClient.connect();
+        locationAPICallback.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        googleApiClient.disconnect();
+        locationAPICallback.disconnect();
     }
 }
