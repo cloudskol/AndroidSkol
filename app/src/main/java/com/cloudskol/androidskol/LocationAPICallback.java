@@ -11,8 +11,8 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 /**
  * @author tham
  */
-public class LocationAPIClient implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener {
-    private final String LOG_TAG = LocationAPIClient.class.getSimpleName();
+public class LocationAPICallback implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener {
+    private final String LOG_TAG = LocationAPICallback.class.getSimpleName();
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {

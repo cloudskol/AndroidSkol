@@ -10,10 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
     private void initUi() {
         TextView locationTextView = (TextView) findViewById(R.id.location);
         locationTextView.setText("Tham");
+
+        final LocationAPICallback locationAPICallback = new LocationAPICallback();
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(locationAPICallback)
+                .addOnConnectionFailedListener(locationAPICallback)
+                .build();
     }
 
     @Override
