@@ -1,5 +1,8 @@
 package com.cloudskol.androidskol;
 
+import android.*;
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -26,12 +30,14 @@ public class LocationAPICallback implements ConnectionCallbacks,
 
     private final String LOG_TAG = LocationAPICallback.class.getSimpleName();
 
-    private Context context;
+    private Activity activity;
     private GoogleApiClient googleApiClient;
 
-    public LocationAPICallback(Context context) {
-        this.context = context;
-        googleApiClient = new GoogleApiClient.Builder(context)
+    private int MY_PERMISSION;
+
+    public LocationAPICallback(Activity activity) {
+        this.activity = activity;
+        googleApiClient = new GoogleApiClient.Builder(activity)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -42,19 +48,19 @@ public class LocationAPICallback implements ConnectionCallbacks,
     public void onConnected(@Nullable Bundle bundle) {
         Log.v(LOG_TAG, "onConnected");
 
-        final LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-                .setInterval(10);
+//        Log.v(LOG_TAG, "Fine location: " + ActivityCompat.checkSelfPermission(activity,
+//                android.Manifest.permission.ACCESS_FINE_LOCATION));
+//
+//        Log.v(LOG_TAG, "Coarse location: " + ActivityCompat.checkSelfPermission(activity,
+//                android.Manifest.permission.ACCESS_COARSE_LOCATION));
 
-        if (ActivityCompat.checkSelfPermission(context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.v(LOG_TAG, "Inside the permission check");
-            return;
-        }
+//        if (ActivityCompat.checkSelfPermission(context,
+//                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            Log.v(LOG_TAG, "Inside the permission check");
+//            return;
+//        }
 
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        requestPermission();
     }
 
     @Override
@@ -84,5 +90,31 @@ public class LocationAPICallback implements ConnectionCallbacks,
 
     public void disconnect() {
         googleApiClient.disconnect();
+    }
+
+    private boolean hasRequiredPermission() {
+        return ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestPermission() {
+        if (hasRequiredPermission()) {
+            return;
+        }
+
+
+
+        final LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(10);
+
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION);
+
+            Log.v(LOG_TAG, "Permission: " + MY_PERMISSION);
+        }
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
     }
 }
