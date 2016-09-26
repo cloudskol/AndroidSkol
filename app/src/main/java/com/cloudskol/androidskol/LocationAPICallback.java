@@ -98,9 +98,9 @@ public class LocationAPICallback implements ConnectionCallbacks,
     }
 
     private void requestPermission() {
-        if (hasRequiredPermission()) {
-            return;
-        }
+//        if (hasRequiredPermission()) {
+//            return;
+//        }
 
 
 
